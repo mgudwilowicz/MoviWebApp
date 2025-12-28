@@ -1,8 +1,9 @@
 import os
 
 from flask import Flask
+from data_manager import DataManager
 
-from models import db
+from models import db, Movie
 
 app = Flask(__name__)
 
@@ -11,20 +12,20 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"sqlite:///{os.path.join(basedir, 'data/db.sqlite')}"
 )
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
+data_manager = DataManager()
 
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
-
+@app.route('/')
+def home():
+    return "Welcome to Marti MoviWeb App!"
 
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+  with app.app_context():
+    db.create_all()
 
+  app.run(debug=True, port=5002)
