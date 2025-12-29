@@ -21,7 +21,7 @@ data_manager = DataManager()
 
 @app.route('/')
 def home():
-    return "Welcome to Marti MoviWeb App!"
+    return render_template("base.html")
 
 @app.route('/users')
 def list_users():
