@@ -9,7 +9,7 @@ app.secret_key = os.getenv("SECRET_KEY")
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(basedir, 'data/db.sqlite')}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 data_manager = DataManager()
@@ -17,17 +17,19 @@ data_manager = DataManager()
 
 @app.route('/')
 def index():
+    """Render the home page with the list of users."""
     try:
         users = data_manager.get_users()
-        return render_template('index.html', users=users)
+        return render_template("index.html", users=users)
     except Exception as e:
         print("Error loading users:", e)
         flash("An unexpected error occurred while loading users.", "error")
-        return render_template('index.html', users=[])
+        return render_template("index.html", users=[])
 
 
 @app.route("/users", methods=["POST"])
 def create_user():
+    """Create a new user from form data."""
     try:
         name = request.form.get("name")
         if not name:
@@ -41,8 +43,9 @@ def create_user():
     return redirect(url_for("index"))
 
 
-@app.route('/users/<int:user_id>/movies')
+@app.route("/users/<int:user_id>/movies")
 def user_movies(user_id):
+    """Display a user's favorite movies."""
     try:
         user = data_manager.get_user_by_id(user_id)
         if not user:
@@ -58,31 +61,33 @@ def user_movies(user_id):
         return redirect(url_for("index"))
 
 
-@app.route('/users/<int:user_id>/movies', methods=['POST'])
+@app.route("/users/<int:user_id>/movies", methods=["POST"])
 def add_user_movie(user_id):
+    """Add a movie to a user's favorites."""
     try:
         title = request.form.get("title")
         if not title:
             flash("Movie title is required.", "error")
-            return redirect(url_for('user_movies', user_id=user_id))
+            return redirect(url_for("user_movies", user_id=user_id))
 
         movie = data_manager.create_movie(title)
         if not movie:
             flash(f"Movie '{title}' not found in OMDb.", "error")
-            return redirect(url_for('user_movies', user_id=user_id))
+            return redirect(url_for("user_movies", user_id=user_id))
 
         data_manager.add_favorite_movie(user_id, movie.id)
         flash(f"Movie '{movie.name}' added to favorites.", "success")
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for("user_movies", user_id=user_id))
 
     except Exception as e:
         print(f"Error adding movie for user {user_id}:", e)
         flash("An unexpected error occurred while adding the movie.", "error")
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for("user_movies", user_id=user_id))
 
 
-@app.route('/movies/<int:movie_id>/update-title', methods=['POST'])
+@app.route("/movies/<int:movie_id>/update-title", methods=["POST"])
 def update_movie_title(movie_id):
+    """Update the title of a movie."""
     try:
         new_title = request.form.get("title")
         if not new_title:
@@ -101,37 +106,43 @@ def update_movie_title(movie_id):
         return redirect(request.referrer)
 
 
-@app.route('/users/<int:user_id>/movies/<int:movie_id>/delete', methods=['POST'])
+@app.route("/users/<int:user_id>/movies/<int:movie_id>/delete", methods=["POST"])
 def delete_user_movie(user_id, movie_id):
+    """Remove a movie from a user's favorites."""
     try:
         user = data_manager.remove_favorite_movie(user_id, movie_id)
         if user is None:
             flash("User or movie not found.", "error")
         else:
             flash("Movie removed from favorites.", "success")
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for("user_movies", user_id=user_id))
 
     except Exception as e:
         print(f"Error deleting movie {movie_id} for user {user_id}:", e)
         flash("An unexpected error occurred while deleting the movie.", "error")
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for("user_movies", user_id=user_id))
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    """Render custom 404 page."""
+    return render_template("404.html"), 404
+
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
+    """Render custom 500 page."""
+    return render_template("500.html"), 500
+
 
 @app.errorhandler(400)
 def bad_request(e):
+    """Render custom 400 page."""
     return render_template("400.html"), 400
 
 
-if __name__ == '__main__':
-  with app.app_context():
-    db.create_all()
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
 
-  app.run(debug=True, port=5002)
+    app.run(debug=True, port=5002)

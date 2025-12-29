@@ -1,30 +1,23 @@
-import requests
 import os
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-api_key = os.getenv("API_KEY")
-
-url = f"http://www.omdbapi.com/?apikey={api_key}&t="
-
-headers = {
-    "Content-Type": "application/json"
-}
+API_KEY = os.getenv("API_KEY")
+BASE_URL = f"http://www.omdbapi.com/?apikey={API_KEY}&t="
+HEADERS = {"Content-Type": "application/json"}
 
 
-
-def fetch_movie(movie):
-    response = requests.get(url + movie, headers=headers)
+def fetch_movie(title):
+    """Fetch movie info from OMDb API by title. Returns dict or None."""
+    response = requests.get(BASE_URL + title, headers=HEADERS)
     data = response.json()
-
     if data.get("Response") == "False":
         return None
-
     return {
         "name": data.get("Title"),
         "director": data.get("Director"),
         "year": data.get("Released"),
-        "poster_url": data.get("Poster")
+        "poster_url": data.get("Poster"),
     }
-
