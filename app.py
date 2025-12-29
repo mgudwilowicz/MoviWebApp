@@ -20,20 +20,17 @@ data_manager = DataManager()
 
 
 @app.route('/')
-def home():
-    return render_template("base.html")
-
-@app.route('/users')
-def list_users():
+def index():
     users = data_manager.get_users()
-    return render_template("users.html", users=users)
+    return render_template('index.html', users=users)
+
 
 @app.route("/users", methods=["POST"])
-def add_user():
+def create_user():
     name = request.form.get("name")
     if name:
         data_manager.create_user(name)
-    return redirect(url_for("home"))
+    return redirect(url_for("index"))
 
 @app.route('/users/<int:user_id>/movies')
 def user_movies(user_id):

@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>Movies for {{ user.name }}</h1>
-
+<a class="back-link" href="{{ url_for('index') }}">← Back to Users</a>
 <form class="add-movie-form"
       method="POST"
       action="{{ url_for('add_user_movie', user_id=user.id) }}">

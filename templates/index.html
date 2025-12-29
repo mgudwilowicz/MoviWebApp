@@ -4,16 +4,6 @@
 
 <h1>Users</h1>
 
-<form class="user-form" method="POST" action="{{ url_for('add_user') }}">
-    <input
-        type="text"
-        name="name"
-        placeholder="Enter user name"
-        required
-    >
-    <button type="submit">Add User</button>
-</form>
-
 {% if users %}
     <ul class="user-list">
         {% for user in users %}
@@ -27,5 +17,15 @@
 {% else %}
     <p class="empty-state">No users found.</p>
 {% endif %}
+
+<form class="user-form" method="POST" action="{{ url_for('create_user') }}">
+    <input
+        type="text"
+        name="name"
+        placeholder="Enter user name"
+        required
+    >
+    <button type="submit">Add User</button>
+</form>
 
 {% endblock %}
