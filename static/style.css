@@ -206,3 +206,72 @@ h1 {
 .empty-state {
     color: #666;
 }
+
+/* Error pages */
+
+.error-page {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.error-page h1 {
+    font-size: 96px;
+    margin-bottom: 16px;
+    color: #2563eb;
+}
+
+.error-page p {
+    font-size: 18px;
+    color: #6b7280;
+    margin-bottom: 32px;
+}
+
+.back-home {
+    display: inline-block;
+    background: #2563eb;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-home:hover {
+    background: #1d4ed8;
+}
+
+.flash-container {
+    margin-bottom: 20px;
+    display: block;
+    position: fixed;
+    top: 10px;
+    right: 8px;
+
+}
+
+.flash {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-weight: 500;
+    opacity: 1;
+    animation: fadeOut 0.5s ease-in-out 2s forwards;
+}
+
+
+.flash.success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.flash.error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+
+    }
+}

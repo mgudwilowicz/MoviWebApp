@@ -1,11 +1,12 @@
 import os
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from data_manager import DataManager
 
 from models import db, Movie
 
 app = Flask(__name__)
+app.secret_key = "super-secret-key"
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -28,15 +29,20 @@ def index():
 @app.route("/users", methods=["POST"])
 def create_user():
     name = request.form.get("name")
-    if name:
+    if not name:
+        flash("User name cannot be empty.", "error")
+    else:
         data_manager.create_user(name)
+        flash(f"User '{name}' created successfully.", "success")
     return redirect(url_for("index"))
 
 @app.route('/users/<int:user_id>/movies')
 def user_movies(user_id):
     user = data_manager.get_user_by_id(user_id)
     if not user:
-        return "User not found", 404
+        if not user:
+            flash("User not found.", "error")
+            return redirect(url_for("index"))
 
     movies = data_manager.get_user_favorites(user_id)
     return render_template("user_movies.html", user=user, movies=movies)
@@ -44,16 +50,17 @@ def user_movies(user_id):
 @app.route('/users/<int:user_id>/movies', methods=['POST'])
 def add_user_movie(user_id):
     title = request.form.get("title")
-
     if not title:
-        return "Movie title is required", 400
+        flash("Movie title is required.", "error")
+        return redirect(url_for('user_movies', user_id=user_id))
 
     movie = data_manager.create_movie(title)
     if not movie:
-        return "Movie not found in OMDb", 404
+        flash(f"Movie '{title}' not found in OMDb.", "error")
+        return redirect(url_for('user_movies', user_id=user_id))
 
     data_manager.add_favorite_movie(user_id, movie.id)
-
+    flash(f"Movie '{movie.name}' added to favorites.", "success")
     return redirect(url_for('user_movies', user_id=user_id))
 
 
@@ -62,12 +69,13 @@ def update_movie_title(movie_id):
     new_title = request.form.get("title")
 
     if not new_title:
-        return "Title is required", 400
+        flash("Title cannot be empty.", "error")
+        return redirect(request.referrer)
 
     movie = Movie.query.get_or_404(movie_id)
     movie.name = new_title
-
     db.session.commit()
+    flash("Movie title updated successfully.", "success")
 
     return redirect(request.referrer)
 
@@ -76,9 +84,23 @@ def delete_user_movie(user_id, movie_id):
     user = data_manager.remove_favorite_movie(user_id, movie_id)
 
     if user is None:
-        return "User or movie not found", 404
+        flash("User or movie not found.", "error")
+    else:
+        flash("Movie removed from favorites.", "success")
 
     return redirect(url_for('user_movies', user_id=user_id))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template("400.html"), 400
 
 
 if __name__ == '__main__':
