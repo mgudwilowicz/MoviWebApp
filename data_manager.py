@@ -34,6 +34,9 @@ class DataManager:
 
     def create_movie(self, name):
         movie_data = fetch_movie(name)
+        if not movie_data:
+            return None
+
         movie = Movie(
             name=movie_data['name'],
             director=movie_data['director'],
@@ -61,14 +64,6 @@ class DataManager:
         db.session.commit()
         return movie
 
-    def delete_movie(self, movie_id):
-        movie = self.get_movie_by_id(movie_id)
-        if not movie:
-            return None
-
-        db.session.delete(movie)
-        db.session.commit()
-        return movie
 
     # ---------- FAVORITES (MANY-TO-MANY) ----------
 

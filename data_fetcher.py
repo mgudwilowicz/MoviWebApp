@@ -18,5 +18,13 @@ def fetch_movie(movie):
     response = requests.get(url + movie, headers=headers)
     data = response.json()
 
-    return {'name': data['Title'], 'director': data['Director'], 'year': data['Released'], 'poster_url': data['Poster']}
+    if data.get("Response") == "False":
+        return None
+
+    return {
+        "name": data.get("Title"),
+        "director": data.get("Director"),
+        "year": data.get("Release"),
+        "poster_url": data.get("Poster")
+    }
 
