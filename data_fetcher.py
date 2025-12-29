@@ -24,7 +24,7 @@ def fetch_movie(movie):
     return {
         "name": data.get("Title"),
         "director": data.get("Director"),
-        "year": data.get("Release"),
+        "year": data.get("Released"),
         "poster_url": data.get("Poster")
     }
 
