@@ -6,7 +6,7 @@ from data_manager import DataManager
 from models import db, Movie
 
 app = Flask(__name__)
-app.secret_key = "super-secret-key"
+app.secret_key = os.getenv("SECRET_KEY")
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
